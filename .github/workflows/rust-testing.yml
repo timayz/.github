@@ -3,6 +3,9 @@ name: "Rust testing"
 on:
   workflow_call:
 
+env:
+  RUST_BACKTRACE: 1
+
 jobs:
   test:
     name: Test ${{ matrix.rust }}
