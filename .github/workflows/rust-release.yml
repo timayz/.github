@@ -42,13 +42,6 @@ jobs:
           command: install
           args: semantic-release-rust --version 1.0.0-alpha.8
 
-      # The release build is used in the Semantic Release step
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
-
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
