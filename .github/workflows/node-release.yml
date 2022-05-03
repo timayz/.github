@@ -2,10 +2,6 @@ name: "Node release"
 
 on:
   workflow_call:
-    inputs:
-      filters:
-        required: true
-        type: string
     secrets:
       GH_TOKEN:
         required: true
