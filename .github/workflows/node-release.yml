@@ -21,19 +21,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           persist-credentials: false
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 6.32.4
       - uses: actions/setup-node@v3
         with:
           node-version: "14.x"
-          cache: "pnpm"
+          cache: "npm"
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
       - name: Build
-        run: pnpm build ${{ inputs.filters }}
-      - name: Create package
-        run: mkdir build && cp -a dist build/ && cp package.json build/
+        run: npm run build
       - name: Release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
