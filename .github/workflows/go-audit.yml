@@ -15,4 +15,5 @@ jobs:
       - run: go list -json > go.list
       - name: Run nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
-      - run: cat go.list
+          with:
+            nancyCommand: sleuth --loud
