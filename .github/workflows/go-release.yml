@@ -23,7 +23,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - run: echo $HOME
+      - run: ls ~/.cache/go-build
+      - run: ls ~/go/pkg/mod
 
       # - uses: actions/setup-go@v3
       #   with:
