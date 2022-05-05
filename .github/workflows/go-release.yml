@@ -28,7 +28,7 @@ jobs:
           go-version: '1.18'
 
       - run: go mod download
-      - run: ls $GOPATH/pkg/mod
+      - run: ls ~/go/pkg/mod
 
       # - name: Semantic Release
       #   uses: cycjimmy/semantic-release-action@v2
