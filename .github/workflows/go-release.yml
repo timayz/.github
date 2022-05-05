@@ -28,7 +28,9 @@ jobs:
           go-version: '1.18'
 
       - run: go mod download
-      - run: mv ~/go/pkg/mod ./go_pkg_mod
+
+      - name: Move go mod to root folder
+        run: mv ~/go/pkg/mod ./go_pkg_mod
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
