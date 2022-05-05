@@ -1,0 +1,22 @@
+name: "Go testing"
+
+on:
+  workflow_call:
+
+jobs:
+  nancy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+      - run: go list -json > go.list
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        env:
+          GOGC: 100
+        with:
+          args: --timeout 10m0s
+          skip-go-installation: true
+          skip-pkg-cache: true
