@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  nancy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,4 +20,5 @@ jobs:
           args: --timeout 10m0s
           skip-go-installation: true
           skip-pkg-cache: true
-      - run: go test -v ./...
+      - name: Run test
+        run: go test -v ./...
