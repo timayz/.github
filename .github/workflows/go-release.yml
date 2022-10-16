@@ -27,13 +27,13 @@ jobs:
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
         with:
-          semantic_version: 19.0.2
+          semantic_version: 19.0.5
           extra_plugins: |
             @semantic-release/exec@6.0
             @semantic-release/git@10.0
             @codedependant/semantic-release-docker@4.1
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           DOCKER_BUILDKIT: 1
           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
