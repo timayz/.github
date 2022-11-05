@@ -45,6 +45,9 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
 
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+
       - name: Check Format
         if: matrix.rust == 'stable'
         uses: actions-rs/cargo@v1
