@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       image:
+        type: string
         required: true
     secrets:
       DOCKER_REGISTRY_USER:
