@@ -8,8 +8,6 @@ env:
 
 jobs:
   cargo:
-    name: Test ${{ matrix.rust }}
-
     services:
       postgres:
         image: postgres:15-alpine
@@ -25,34 +23,25 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
-    strategy:
-      matrix:
-        rust:
-          - stable
-          - beta
-          - nightly
-
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Rust (${{ matrix.rust }})
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
 
       - name: Check Format
-        if: matrix.rust == 'stable'
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: -- --check
 
       - name: Clippy
-        if: matrix.rust == 'stable'
         uses: actions-rs/cargo@v1
         with:
           command: clippy
