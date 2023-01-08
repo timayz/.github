@@ -93,4 +93,4 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           repository: timada-org/sdk
           event-type: released
-          client-payload: '{"pkg_name": ${{ inputs.service_name }}, "pkg_spec": ${{ toJson(env.pkg_spec) }}}'
+          client-payload: '{"pkg_name": "${{ inputs.service_name }}", "pkg_spec": ${{ toJson(env.pkg_spec) }}}'
