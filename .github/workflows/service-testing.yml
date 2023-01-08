@@ -95,3 +95,5 @@ jobs:
         run: pnpm install
 
       - run: pnpm --stream -r lint
+      - run: pnpm --stream -r test
+
