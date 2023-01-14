@@ -29,11 +29,13 @@ jobs:
           persist-credentials: false
 
       - uses: pnpm/action-setup@v2
+        with:
+          version: 7
 
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          ache: 'pnpm'
+          cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
 
