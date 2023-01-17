@@ -38,3 +38,6 @@ jobs:
 
       - run: pnpm --stream -r lint
       - run: pnpm --stream -r test
+
+      - name: Validate openapi
+        run: node_modules/.bin/swagger-cli validate api/openapi-spec/v3/openapi.yaml
