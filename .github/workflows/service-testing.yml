@@ -39,5 +39,12 @@ jobs:
       - run: pnpm --stream -r lint
       - run: pnpm --stream -r test
 
+      - name: Check file existence
+        id: check_files
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "spec/openapi.yaml"
+
       - name: Validate openapi
+        if: steps.check_files.outputs.files_exists == 'true'
         run: node_modules/.bin/swagger-cli validate spec/openapi.yaml
