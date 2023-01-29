@@ -2,6 +2,9 @@ name: "Rust testing"
 
 on:
   workflow_call:
+    secrets:
+      GH_TOKEN:
+        required: false
 
 env:
   RUST_BACKTRACE: 1
@@ -43,6 +46,8 @@ jobs:
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Check Format
         if: matrix.rust == 'stable'

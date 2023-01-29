@@ -34,6 +34,8 @@ jobs:
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
