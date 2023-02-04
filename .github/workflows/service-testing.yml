@@ -36,14 +36,12 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Check Format
-        if: matrix.rust == 'stable'
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: -- --check
 
       - name: Clippy
-        if: matrix.rust == 'stable'
         uses: actions-rs/cargo@v1
         with:
           command: clippy
