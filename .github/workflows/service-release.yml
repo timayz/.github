@@ -55,6 +55,7 @@ jobs:
             @semantic-release/npm@9.0
             @codedependant/semantic-release-docker@4.1
             @google/semantic-release-replace-plugin@1.2
+            @timada/semantic-release-cargo@1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
