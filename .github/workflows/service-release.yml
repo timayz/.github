@@ -9,10 +9,15 @@ on:
     secrets:
       GH_TOKEN:
         required: true
+      CARGO_REGISTRY_TOKEN:
+        required: true
       DOCKER_REGISTRY_USER:
         required: false
       DOCKER_REGISTRY_PASSWORD:
         required: false
+
+env:
+  RUST_BACKTRACE: 1
 
 jobs:
   release:
@@ -27,6 +32,14 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
 
       - uses: pnpm/action-setup@v2
         with:
@@ -50,8 +63,10 @@ jobs:
             @semantic-release/npm@9.0
             @codedependant/semantic-release-docker@4.1
             @google/semantic-release-replace-plugin@1.2
+            @timada/semantic-release-cargo@1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
