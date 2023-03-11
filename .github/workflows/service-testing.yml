@@ -14,49 +14,6 @@ jobs:
   cargo:
     runs-on: ubuntu-latest
 
-    # services:
-    #   postgres:
-    #     image: postgres:15-alpine
-    #     env:
-    #       POSTGRES_PASSWORD: postgres
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       - 5432:5432
-      # pikav:
-      #   image: timada0/pikav:0.12.3
-      #   # env:
-      #   #   POSTGRES_PASSWORD: postgres
-      #   # options: >-
-      #   #   --health-cmd pg_isready
-      #   #   --health-interval 10s
-      #   #   --health-timeout 5s
-      #   #   --health-retries 5
-      #   ports:
-      #     - 6750:6750
-      #     - 6751:6751
-
-
-  # pikav:
-  #   image: timada0/pikav:0.12.3
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.pikav.rule=Host(`pikav.localhost`)"
-  #     - "traefik.http.routers.pikav.tls=true"
-  #     - "traefik.http.routers.pikav.entrypoints=https"
-  #   depends_on:
-  #     - oathkeeper
-  #   ports:
-  #     - "6750:6750"
-  #     - "6751:6751"
-  #   volumes:
-  #     - ./pikav/pikav.yml:/etc/pikav/config.yml
-  #   networks:
-  #     - intranet
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -69,17 +26,17 @@ jobs:
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
-      # - name: Check Format
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: fmt
-      #     args: -- --check
+      - name: Check Format
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
 
-      # - name: Clippy
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: clippy
-      #     args: --all-features -- -D warnings
+      - name: Clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-features -- -D warnings
 
       - name: Start a single CockroachDB instance with docker
         env:
