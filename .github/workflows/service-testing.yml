@@ -2,6 +2,10 @@ name: "Service testing"
 
 on:
   workflow_call:
+    inputs:
+      db_name:
+        required: true
+        type: string
 
 env:
   RUST_BACKTRACE: 1
@@ -9,19 +13,6 @@ env:
 jobs:
   cargo:
     runs-on: ubuntu-latest
-
-    # services:
-    #   postgres:
-    #     image: postgres:15-alpine
-    #     env:
-    #       POSTGRES_PASSWORD: postgres
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       - 5432:5432
 
     steps:
       - name: Checkout
@@ -47,10 +38,19 @@ jobs:
           command: clippy
           args: --all-features -- -D warnings
 
+      - name: Start a single CockroachDB instance with docker
+        env:
+          CONTAINER_ENTRYPOINT: ${{ 'cockroach' }}
+        run: |
+          echo $CONTAINER_ENTRYPOINT
+          docker pull cockroachdb/cockroach:v22.2.5
+          docker run -d --name roach --hostname roach -p 26257:26257 -p 8080:8080 cockroachdb/cockroach:v22.2.5 start-single-node --insecure
+          sudo apt update && sudo apt install wait-for-it -y
+          wait-for-it -h localhost -p 26257
+          docker exec roach bash -c "echo 'CREATE DATABASE ${{ inputs.db_name }};CREATE USER IF NOT EXISTS ${{ inputs.db_name }}; GRANT ALL ON DATABASE ${{ inputs.db_name }} TO ${{ inputs.db_name }} WITH GRANT OPTION;ALTER USER ${{ inputs.db_name }} CREATEDB;' | $CONTAINER_ENTRYPOINT sql --insecure"
+
       - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
+        run: make test
   pnpm:
     runs-on: ubuntu-latest
     steps:
