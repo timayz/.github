@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  cargo:
+  audit:
     if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
@@ -14,13 +14,3 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: audit
-  pnpm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
-
-      - run: pnpm audit

@@ -11,7 +11,7 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  cargo:
+  fmt:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,6 +38,42 @@ jobs:
           command: clippy
           args: --all-features -- -D warnings
 
+  clippy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
+
+      - name: Clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-features -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
+
       - name: Start a single CockroachDB instance with docker
         env:
           CONTAINER_ENTRYPOINT: ${{ 'cockroach' }}
@@ -51,21 +87,3 @@ jobs:
 
       - name: Test
         run: make test
-  pnpm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          # cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - run: pnpm --stream -r lint
-      - run: pnpm --stream -r test
