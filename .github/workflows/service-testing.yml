@@ -23,10 +23,10 @@ jobs:
         with:
           components: rustfmt
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GH_TOKEN }}
+      # - name: Install Protoc
+      #   uses: arduino/setup-protoc@v1
+      #   with:
+      #     repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Check Format
         run: cargo fmt -- --check
@@ -43,13 +43,33 @@ jobs:
         with:
           components: clippy
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GH_TOKEN }}
+      # - name: Install Protoc
+      #   uses: arduino/setup-protoc@v1
+      #   with:
+      #     repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Clippy
         run: cargo clippy --all-features -- -D warnings
+
+  udeps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Udeps
+        run: |
+          cargo install cargo-udeps || true
+          cargo udeps
+
+      # - name: Install Protoc
+      #   uses: arduino/setup-protoc@v1
+      #   with:
+      #     repo-token: ${{ secrets.GH_TOKEN }}
 
   test:
     runs-on: ubuntu-latest

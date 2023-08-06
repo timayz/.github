@@ -18,3 +18,33 @@ jobs:
 
       - name: Audit
         run: cargo audit
+  
+  outdated:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Uutdated
+        run: |
+          cargo install cargo-outdated || true
+          cargo outdated --exit-code 1
+  
+  pants:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Uutdated
+        run: |
+          cargo install cargo-pants || true
+          cargo pants
