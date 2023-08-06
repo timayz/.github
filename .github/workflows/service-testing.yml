@@ -16,10 +16,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
@@ -27,26 +29,19 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Check Format
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
-
-      - name: Clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all-features -- -D warnings
+        run: cargo fmt -- --check
 
   clippy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
@@ -54,17 +49,14 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all-features -- -D warnings
+        run: cargo clippy --all-features -- -D warnings
 
   test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
