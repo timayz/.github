@@ -61,10 +61,10 @@ jobs:
           cargo install cargo-udeps || true
           cargo udeps
 
-      # - name: Install Protoc
-      #   uses: arduino/setup-protoc@v1
-      #   with:
-      #     repo-token: ${{ secrets.GH_TOKEN }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
 
   test:
     runs-on: ubuntu-latest
