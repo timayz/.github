@@ -53,7 +53,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-clippy-
 
       - name: Clippy
@@ -84,7 +84,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-udeps-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-udeps-
 
       - name: Udeps
@@ -113,7 +113,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-deny-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-deny-
 
       - name: Deny
@@ -146,7 +146,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-test-
 
       - name: Start a single CockroachDB instance with docker
