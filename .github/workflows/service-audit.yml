@@ -44,7 +44,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Uutdated
+      - name: Pants
         run: |
           cargo install cargo-pants || true
           cargo pants
