@@ -29,7 +29,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Uutdated
+      - name: Audit
         run: |
           cargo install cargo-audit || true
           cargo audit
