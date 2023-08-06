@@ -25,7 +25,7 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-outdated-
 
       - name: Uutdated
         run: |
@@ -53,7 +53,7 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-audit-
 
       - name: Audit
         run: |
@@ -81,7 +81,7 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-pants-
 
       - name: Pants
         run: |

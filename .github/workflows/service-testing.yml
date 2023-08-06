@@ -43,6 +43,19 @@ jobs:
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-clippy-
+
       - name: Clippy
         run: cargo clippy --all-features -- -D warnings
 
@@ -72,7 +85,7 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-udeps-
 
       - name: Udeps
         run: |
@@ -101,7 +114,7 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-deny-
 
       - name: Deny
         run: |
@@ -134,7 +147,7 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-test-
 
       - name: Start a single CockroachDB instance with docker
         env:
