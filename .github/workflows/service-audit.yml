@@ -4,24 +4,9 @@ on:
   workflow_call:
 
 jobs:
-  audit:
+  outdated:
     if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: audit
-
-      - name: Audit
-        run: cargo audit
-  
-  outdated:
-    runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -34,9 +19,24 @@ jobs:
           cargo install cargo-outdated || true
           cargo outdated --exit-code 1
   
-  pants:
+  audit:
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Uutdated
+        run: |
+          cargo install cargo-audit || true
+          cargo audit
+  
+  pants:
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
