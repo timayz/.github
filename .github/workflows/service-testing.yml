@@ -64,7 +64,8 @@ jobs:
       - name: Udeps
         run: |
           cargo install cargo-udeps || true
-          cargo udeps
+          make udeps
+          make udeps.leptos
 
   deny:
     runs-on: ubuntu-latest
@@ -73,18 +74,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Install Protoc
-      #   uses: arduino/setup-protoc@v2
-      #   with:
-      #     repo-token: ${{ secrets.GH_TOKEN }}
-
       - name: Install Rust
         uses: dtolnay/rust-toolchain@nightly
 
       - name: Deny
         run: |
           cargo install cargo-deny || true
-          cargo deny check
+          make deny
 
   test:
     runs-on: ubuntu-latest
