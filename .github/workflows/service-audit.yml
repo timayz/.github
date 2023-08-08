@@ -29,7 +29,7 @@ jobs:
 
       - name: Uutdated
         run: |
-          cargo install cargo-outdated || true
+          cargo install --locked cargo-outdated || true
           cargo outdated --exit-code 1
   
   audit:
@@ -57,7 +57,7 @@ jobs:
 
       - name: Audit
         run: |
-          cargo install cargo-audit || true
+          cargo install --locked cargo-audit || true
           cargo audit
   
   pants:
@@ -85,5 +85,5 @@ jobs:
 
       - name: Pants
         run: |
-          cargo install cargo-pants || true
+          cargo install --locked cargo-pants || true
           cargo pants

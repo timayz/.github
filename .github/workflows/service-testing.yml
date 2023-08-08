@@ -89,7 +89,7 @@ jobs:
 
       - name: Udeps
         run: |
-          cargo install cargo-udeps || true
+          cargo install --locked cargo-udeps || true
           make udeps
           make udeps.leptos
 
@@ -118,7 +118,7 @@ jobs:
 
       - name: Deny
         run: |
-          cargo install cargo-deny || true
+          cargo install --locked cargo-deny || true
           make deny
 
   test:
