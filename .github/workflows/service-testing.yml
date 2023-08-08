@@ -72,7 +72,7 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Set up cargo cache
         uses: actions/cache@v3
