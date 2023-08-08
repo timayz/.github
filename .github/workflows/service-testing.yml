@@ -72,7 +72,7 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@nightly
 
       - name: Set up cargo cache
         uses: actions/cache@v3
@@ -118,7 +118,7 @@ jobs:
 
       - name: Deny
         run: |
-          cargo install cargo-deny || true
+          cargo install --locked cargo-deny || true
           make deny
 
   test:
