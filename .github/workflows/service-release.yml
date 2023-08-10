@@ -23,6 +23,30 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Create config file
+        run:  |
+            cat <<EOF >.releaserc.yml [
+              "@semantic-release/commit-analyzer",
+              "@semantic-release/release-notes-generator",
+              "@semantic-release/github",
+              {
+                path: "@timada/semantic-release-cargo",
+                cargoPublish: false
+              },
+              {
+                path: "@semantic-release/exec",
+                prepareCmd: "cargo update"
+              },
+              {
+                path: "@semantic-release/git",
+                assets: [
+                  "**/Cargo.toml",
+                  "Cargo.lock"
+                ]
+              }
+            ]
+          EOF
+
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
         id: semantic
