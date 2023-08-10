@@ -23,9 +23,14 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Create config file
-        run:  |
-            cat <<EOF >.releaserc.yml [
+    - name: Create config file
+      uses: "DamianReeves/write-file-action@master"
+      with:
+        path: .releaserc.yml
+        write-mode: overwrite
+        contents: |
+          {
+            plugins: [
               "@semantic-release/commit-analyzer",
               "@semantic-release/release-notes-generator",
               "@semantic-release/github",
@@ -43,9 +48,8 @@ jobs:
                   "**/Cargo.toml",
                   "Cargo.lock"
                 ]
-              }
-            ]
-          EOF
+              }]
+            }
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
