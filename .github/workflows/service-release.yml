@@ -69,27 +69,6 @@ jobs:
                 prerelease: true
               }
             ]
-          plugins: |
-            [
-              "@semantic-release/commit-analyzer",
-              "@semantic-release/release-notes-generator",
-              "@semantic-release/github",
-              {
-                path: "@timada/semantic-release-cargo",
-                cargoPublish: false
-              },
-              {
-                path: "@semantic-release/exec",
-                prepareCmd: "cargo update"
-              },
-              {
-                path: "@semantic-release/git",
-                assets: [
-                  "**/Cargo.toml",
-                  "Cargo.lock"
-                ]
-              }
-            ]
           extra_plugins: |
             @semantic-release/exec@6.0
             @semantic-release/git@10.0
