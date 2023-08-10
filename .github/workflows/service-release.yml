@@ -48,7 +48,7 @@ jobs:
               "@semantic-release/github",
               {
                 path: "@timada/semantic-release-cargo",
-                publish: false
+                cargoPublish: false
               },
               {
                 path: "@semantic-release/exec",
