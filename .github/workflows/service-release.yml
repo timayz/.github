@@ -2,22 +2,9 @@ name: "Service release"
 
 on:
   workflow_call:
-    inputs:
-      service_name:
-        required: true
-        type: string
     secrets:
       GH_TOKEN:
         required: true
-      CARGO_REGISTRY_TOKEN:
-        required: true
-      DOCKER_REGISTRY_USER:
-        required: false
-      DOCKER_REGISTRY_PASSWORD:
-        required: false
-
-env:
-  RUST_BACKTRACE: 1
 
 jobs:
   release:
@@ -36,57 +23,48 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          repo-token: ${{ secrets.GH_TOKEN }}
-
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          # cache: 'pnpm'
-
-      - run: pnpm install --frozen-lockfile
-
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
         id: semantic
         with:
-          semantic_version: 19.0.5
+          semantic_version: 21.0.7
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'main',
+              {
+                name: 'beta',
+                prerelease: true
+              },
+              {
+                name: 'alpha',
+                prerelease: true
+              }
+            ]
+          plugins: |
+            [
+              "@semantic-release/commit-analyzer",
+              "@semantic-release/release-notes-generator",
+              "@semantic-release/github",
+              {
+                path: "@timada/semantic-release-cargo",
+                publish: false
+              },
+              {
+                path: "@semantic-release/exec",
+                prepareCmd: "cargo update"
+              },
+              {
+                path: "@semantic-release/git",
+                assets: [
+                  "**/Cargo.toml",
+                  "Cargo.lock"
+                ]
+              }
+            ]
           extra_plugins: |
             @semantic-release/exec@6.0
             @semantic-release/git@10.0
-            @semantic-release/npm@9.0
-            @codedependant/semantic-release-docker@4.1
-            @google/semantic-release-replace-plugin@1.2
             @timada/semantic-release-cargo@1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
-          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-
-      - name: Check file existence
-        id: check_files
-        uses: andstor/file-existence-action@v2
-        with:
-          files: "openapi.json"
-
-      - name: Put spec in env
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: |
-          pkg_spec=$(cat openapi.json)
-          echo "pkg_spec=$pkg_spec" >> $GITHUB_ENV
-      
-      - name: Repository Dispatch
-        if: steps.check_files.outputs.files_exists == 'true'
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-          repository: timada-org/sdk
-          event-type: released
-          client-payload: '{"pkg_name": "${{ inputs.service_name }}", "pkg_spec": ${{ toJson(env.pkg_spec) }}}'
