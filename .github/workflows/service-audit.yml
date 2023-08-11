@@ -5,7 +5,7 @@ on:
 
 jobs:
   outdated:
-    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,7 +33,7 @@ jobs:
           cargo outdated --exit-code 1
   
   audit:
-    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
+    if: "!contains(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -61,7 +61,7 @@ jobs:
           cargo audit
   
   pants:
-    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
+    if: "!startsWith(github.event.commits[0].message, '[skip ci]')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

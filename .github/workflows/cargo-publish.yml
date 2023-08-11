@@ -2,19 +2,12 @@ name: "Service docker"
 
 on:
   workflow_call:
-    inputs:
-      packages:
-        required: true
-        type: string
     secrets:
       CARGO_REGISTRY_TOKEN:
         required: true
 
 jobs:
   build:
-    strategy:
-      matrix:
-        package: ${{ fromJson(inputs.packages) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,4 +17,4 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Publish
-        run: cargo publish --no-verify -p ${{ matrix.package }}
+        run: cargo publish --no-verify
