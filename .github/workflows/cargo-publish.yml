@@ -63,3 +63,4 @@ jobs:
         #   CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
           python publish.py
+          echo "Got Exit Code : $?"
