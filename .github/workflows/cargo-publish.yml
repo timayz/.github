@@ -47,6 +47,7 @@ jobs:
                         config = tomlkit.load(fp)
 
                 package = config["package"]
+
                 if not "publish" in package:
                     continue
 
