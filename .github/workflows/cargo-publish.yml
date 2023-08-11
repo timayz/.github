@@ -13,6 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Create config file
+        uses: "DamianReeves/write-file-action@master"
+        with:
+          path: requirements.txt
+          write-mode: overwrite
+          contents: |
+            tomlkit==0.12.1
+
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
