@@ -53,11 +53,11 @@ jobs:
                 if not package["publish"]:
                     continue
 
-                exit_code = os.system("cargo publish --no-verify -p " + package["name"])
-                print(exit_code)
+                process = subprocess.run(['cargo', 'publish', '--no-verify', '-p', package["name"]])
+                print(process.returncode)
 
-                if exit_code > 0:
-                    sys.exit(exit_code)
+                if process.returncode > 0:
+                    sys.exit(process.returncode)
 
       - name: Publish
         # env:
