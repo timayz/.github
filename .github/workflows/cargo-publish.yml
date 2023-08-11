@@ -6,7 +6,7 @@ on:
       publish:
         default: true
         required: false
-        type: bool
+        type: boolean
     secrets:
       CARGO_REGISTRY_TOKEN:
         required: true
