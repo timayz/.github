@@ -42,7 +42,7 @@ jobs:
               if not package["publish"]:
                   continue
 
-              exit_code = os.system("cargo publish --no-verify -p" + package["name"])
+              exit_code = os.system("cargo publish --no-verify -p " + package["name"])
 
               if exit_code > 0:
                   sys.exit(exit_code)
