@@ -2,6 +2,11 @@ name: "Service docker"
 
 on:
   workflow_call:
+    inputs:
+      publish:
+        default: true
+        required: false
+        type: bool
     secrets:
       CARGO_REGISTRY_TOKEN:
         required: true
@@ -60,6 +65,7 @@ jobs:
                     sys.exit(process.returncode)
 
       - name: Publish
+        if: ${{ inputs.publish }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |

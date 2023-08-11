@@ -6,6 +6,10 @@ on:
       image:
         required: true
         type: string
+      push:
+        default: true
+        required: false
+        type: bool
     secrets:
       DOCKER_REGISTRY_USER:
         required: true
@@ -47,7 +51,7 @@ jobs:
       - name: Build and push image to container registry
         uses: docker/build-push-action@v4
         with:
-          push: true
+          push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
