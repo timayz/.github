@@ -24,7 +24,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-outdated-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-outdated-service-audit
           restore-keys: ${{ runner.os }}-cargo-outdated-
 
       - name: Uutdated
@@ -52,7 +52,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-audit-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-audit-service-audit
           restore-keys: ${{ runner.os }}-cargo-audit-
 
       - name: Audit
@@ -80,7 +80,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/            
-          key: ${{ runner.os }}-cargo-pants-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-pants-service-audit
           restore-keys: ${{ runner.os }}-cargo-pants-
 
       - name: Pants
