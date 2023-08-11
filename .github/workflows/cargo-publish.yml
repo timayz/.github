@@ -13,8 +13,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+
+      - run: pip install tomlkit
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Publish
-        run: cargo publish --no-verify
+        run: |
+          python3 - <<EOF
+          import os, sys, subprocess, json, tomlkit
+
+          metadata = subprocess.run(['cargo', 'metadata', '--format-version', '1', '--offline', '--no-deps'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+          metadata = json.loads(metadata)
+
+          for package in metadata['packages']:
+              with open(package['manifest_path'], mode="rt", encoding="utf-8") as fp:
+                      config = tomlkit.load(fp)
+
+              package = config["package"]
+              if not "publish" in package:
+                  continue
+
+              if not package["publish"]:
+                  continue
+
+              exit_code = os.system("cargo publish --no-verify -p" + package["name"])
+
+              if exit_code > 0:
+                  sys.exit(exit_code)
+          EOF
