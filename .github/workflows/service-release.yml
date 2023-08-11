@@ -31,8 +31,14 @@ jobs:
           contents: |
             {
               plugins: [
-                "@semantic-release/commit-analyzer",
-                "@semantic-release/release-notes-generator",
+                {
+                  path: "@semantic-release/commit-analyzer",
+                  preset: "conventionalcommits"
+                },
+                {
+                  path: "@semantic-release/release-notes-generator",
+                  preset: "conventionalcommits"
+                },
                 "@semantic-release/github",
                 {
                   path: "@timada/semantic-release-cargo",
