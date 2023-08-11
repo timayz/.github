@@ -26,7 +26,7 @@ jobs:
           python-version: '3.9'
           cache: 'pip'
 
-      - run: pip install tomlkit
+      - run: pip install -r requirements.txt
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
