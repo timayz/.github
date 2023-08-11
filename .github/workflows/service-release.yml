@@ -50,6 +50,7 @@ jobs:
                 },
                 {
                   path: "@semantic-release/git",
+                  message: "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
                   assets: [
                     "**/Cargo.toml",
                     "Cargo.lock"
@@ -79,5 +80,6 @@ jobs:
             @semantic-release/exec@6.0
             @semantic-release/git@10.0
             @timada/semantic-release-cargo@1.0
+            conventional-changelog-conventionalcommits@6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

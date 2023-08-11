@@ -1,0 +1,72 @@
+name: "Service docker"
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        default: true
+        required: false
+        type: boolean
+    secrets:
+      CARGO_REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create requirements file
+        uses: "DamianReeves/write-file-action@master"
+        with:
+          path: requirements.txt
+          write-mode: overwrite
+          contents: |
+            tomlkit==0.12.1
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+
+      - run: pip install -r requirements.txt
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Create publish file
+        uses: "DamianReeves/write-file-action@master"
+        with:
+          path: publish.py
+          write-mode: overwrite
+          contents: |
+            import os, sys, subprocess, json, tomlkit
+
+            metadata = subprocess.run(['cargo', 'metadata', '--format-version', '1', '--offline', '--no-deps'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+            metadata = json.loads(metadata)
+
+            for package in metadata['packages']:
+                with open(package['manifest_path'], mode="rt", encoding="utf-8") as fp:
+                        config = tomlkit.load(fp)
+
+                package = config["package"]
+
+                if not "publish" in package:
+                    continue
+
+                if not package["publish"]:
+                    continue
+
+                process = subprocess.run(['cargo', 'publish', '--no-verify', '-p', package["name"]])
+
+                if process.returncode > 0:
+                    sys.exit(process.returncode)
+
+      - name: Publish
+        if: ${{ inputs.publish }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          python publish.py
