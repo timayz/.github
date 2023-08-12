@@ -35,9 +35,8 @@ jobs:
             org.opencontainers.image.licenses=AGPL-3.0
             org.opencontainers.image.vendor=Timada
           tags: |
-            type=schedule
-            type=ref,event=tag
             type=ref,event=pr
+            type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
       - name: Login to container registry
