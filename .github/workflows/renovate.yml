@@ -13,6 +13,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Create config file
+        uses: "DamianReeves/write-file-action@master"
+        with:
+          path: publish.py
+          write-mode: overwrite
+          contents: |
+            {
+              "branchPrefix": "chore/renovate/",
+              "dryRun": "full",
+              "username": "renovate-release",
+              "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+              "onboarding": false,
+              "platform": "github",
+              "includeForks": true,
+              "repositories": [
+                "timayz/starter",
+              ],
+              "packageRules": [
+                {
+                  "description": "lockFileMaintenance",
+                  "matchUpdateTypes": [
+                    "pin",
+                    "digest",
+                    "patch",
+                    "minor",
+                    "major",
+                    "lockFileMaintenance"
+                  ],
+                  "dependencyDashboardApproval": false,
+                  "stabilityDays": 0
+                }
+              ]
+            }
+
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@v39.0.1
         with:
