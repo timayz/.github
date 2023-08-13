@@ -2,6 +2,10 @@ name: "Renovate"
 
 on:
   workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
     secrets:
       GH_TOKEN:
         required: true
@@ -20,7 +24,7 @@ jobs:
           write-mode: overwrite
           contents: |
             {
-              "repositories": ["timayz/starter"],
+              "repositories": ["timayz/${{ inputs.name }}"],
             }
 
       - name: Self-hosted Renovate
