@@ -16,7 +16,7 @@ jobs:
       - name: Create config file
         uses: "DamianReeves/write-file-action@master"
         with:
-          path: publish.py
+          path: renovate.json
           write-mode: overwrite
           contents: |
             {
