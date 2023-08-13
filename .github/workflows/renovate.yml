@@ -20,7 +20,7 @@ jobs:
           write-mode: overwrite
           contents: |
             {
-              "repositories": ["$GITHUB_REPOSITORY"],
+              "repositories": ["${{ github.repository }}"],
             }
 
       - name: Self-hosted Renovate
