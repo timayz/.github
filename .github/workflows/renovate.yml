@@ -1,0 +1,30 @@
+name: "Renovate"
+
+on:
+  workflow_call:
+    secrets:
+      GH_TOKEN:
+        required: true
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create config file
+        uses: "DamianReeves/write-file-action@master"
+        with:
+          path: renovate.json
+          write-mode: overwrite
+          contents: |
+            {
+              "repositories": ["${{ github.repository }}"],
+            }
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v39.0.1
+        with:
+          configurationFile: renovate.json
+          token: ${{ secrets.GH_TOKEN }}
