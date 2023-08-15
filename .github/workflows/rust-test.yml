@@ -137,6 +137,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15.4-alpine
+        image: ${{ inputs.postgres && 'postgres:15-alpine' || '' }}
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -161,14 +177,6 @@ jobs:
             target/            
           key: ${{ runner.os }}-cargo-test-service-testing
           restore-keys: ${{ runner.os }}-cargo-test-
-
-      - name: Start a single Postgres instance with docker
-        if: ${{ inputs.postgres }}
-        run: |
-          docker pull postgres:${{ inputs.postgres-version }}
-          docker run -d --name postgres --hostname postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:${{ inputs.postgres-version }} start-single-node --insecure
-          sudo apt update && sudo apt install wait-for-it -y
-          wait-for-it -h localhost -p 5432
 
       - name: Start a single CockroachDB instance with docker
         if: ${{ inputs.cockroach }}
