@@ -1,19 +1,10 @@
-name: "Rust release"
+name: "Release"
 
 on:
   workflow_call:
     secrets:
       GH_TOKEN:
         required: true
-      CARGO_REGISTRY_TOKEN:
-        required: true
-      DOCKER_REGISTRY_USER:
-        required: false
-      DOCKER_REGISTRY_PASSWORD:
-        required: false
-
-env:
-  RUST_BACKTRACE: 1
 
 jobs:
   release:
@@ -24,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -32,23 +23,63 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+      - name: Create config file
+        uses: "DamianReeves/write-file-action@master"
         with:
-          repo-token: ${{ secrets.GH_TOKEN }}
+          path: .releaserc.yml
+          write-mode: overwrite
+          contents: |
+            {
+              plugins: [
+                {
+                  path: "@semantic-release/commit-analyzer",
+                  preset: "conventionalcommits"
+                },
+                {
+                  path: "@semantic-release/release-notes-generator",
+                  preset: "conventionalcommits"
+                },
+                "@semantic-release/github",
+                {
+                  path: "@timada/semantic-release-cargo",
+                  cargoPublish: false
+                },
+                {
+                  path: "@semantic-release/exec",
+                  prepareCmd: "cargo update"
+                },
+                {
+                  path: "@semantic-release/git",
+                  message: "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
+                  assets: [
+                    "**/Cargo.toml",
+                    "Cargo.lock"
+                  ]
+                }]
+              }
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
         id: semantic
         with:
-          semantic_version: 19.0.5
+          semantic_version: 19
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'main',
+              {
+                name: 'beta',
+                prerelease: true
+              },
+              {
+                name: 'alpha',
+                prerelease: true
+              }
+            ]
           extra_plugins: |
             @semantic-release/exec@6.0
             @semantic-release/git@10.0
-            @codedependant/semantic-release-docker@4.1
             @timada/semantic-release-cargo@1.0
+            conventional-changelog-conventionalcommits@6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
-          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}

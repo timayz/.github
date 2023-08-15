@@ -1,16 +1,89 @@
-name: "Rust audit"
+name: "Audit"
 
 on:
   workflow_call:
 
 jobs:
-  audit:
-    if: "!contains(github.event.commits[0].message, '[skip ci]')"
+  outdated:
+    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
-      - name: Audit
-        uses: actions-rs/cargo@v1
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
         with:
-          command: audit
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-outdated-service-audit
+          restore-keys: ${{ runner.os }}-cargo-outdated-
+
+      - name: Uutdated
+        run: |
+          cargo install --locked cargo-outdated || true
+          cargo outdated --exit-code 1
+  
+  audit:
+    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-audit-service-audit
+          restore-keys: ${{ runner.os }}-cargo-audit-
+
+      - name: Audit
+        run: |
+          cargo install --locked cargo-audit || true
+          cargo audit
+  
+  pants:
+    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-pants-service-audit
+          restore-keys: ${{ runner.os }}-cargo-pants-
+
+      - name: Pants
+        run: |
+          cargo install --locked cargo-pants || true
+          cargo pants

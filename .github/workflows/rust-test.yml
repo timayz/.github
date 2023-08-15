@@ -1,10 +1,23 @@
-name: "Service testing"
+name: "Test"
 
 on:
   workflow_call:
     inputs:
-      db_name:
-        required: true
+      postgres:
+        default: false
+        required: false
+        type: boolean
+      postgres-version:
+        default: '15.4-alpine'
+        required: false
+        type: string
+      cockroach:
+        default: false
+        required: false
+        type: boolean
+      cockroach-version:
+        default: 'v23.1.8'
+        required: false
         type: string
 
 env:
@@ -149,16 +162,22 @@ jobs:
           key: ${{ runner.os }}-cargo-test-service-testing
           restore-keys: ${{ runner.os }}-cargo-test-
 
-      - name: Start a single CockroachDB instance with docker
-        env:
-          CONTAINER_ENTRYPOINT: ${{ 'cockroach' }}
+      - name: Start a single Postgres instance with docker
+        if: ${{ inputs.postgres }}
         run: |
-          echo $CONTAINER_ENTRYPOINT
-          docker pull cockroachdb/cockroach:v23.1.8
-          docker run -d --name roach --hostname roach -p 26257:26257 -p 8080:8080 cockroachdb/cockroach:v22.2.5 start-single-node --insecure
+          docker pull postgres:${{ inputs.postgres-version }}
+          docker run -d --name postgres --hostname postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:${{ inputs.postgres-version }} start-single-node --insecure
+          sudo apt update && sudo apt install wait-for-it -y
+          wait-for-it -h localhost -p 5432
+
+      - name: Start a single CockroachDB instance with docker
+        if: ${{ inputs.cockroach }}
+        run: |
+          docker pull cockroachdb/cockroach:${{ inputs.cockroach-version }}
+          docker run -d --name roach --hostname roach -p 26257:26257 -p 8080:8080 cockroachdb/cockroach:${{ inputs.cockroach-version }} start-single-node --insecure
           sudo apt update && sudo apt install wait-for-it -y
           wait-for-it -h localhost -p 26257
-          docker exec roach bash -c "echo 'CREATE DATABASE ${{ inputs.db_name }};CREATE USER IF NOT EXISTS ${{ inputs.db_name }}; GRANT ALL ON DATABASE ${{ inputs.db_name }} TO ${{ inputs.db_name }} WITH GRANT OPTION;ALTER USER ${{ inputs.db_name }} CREATEDB;' | $CONTAINER_ENTRYPOINT sql --insecure"
+          docker exec roach bash -c "echo 'CREATE USER IF NOT EXISTS 'timada'; GRANT ALL ON DATABASE *.* TO 'timada' WITH GRANT OPTION;ALTER USER 'timada' CREATEDB;' | cockroach sql --insecure"
 
       - name: Test
         run: make test
