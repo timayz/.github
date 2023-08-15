@@ -139,7 +139,6 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15.4-alpine
         image: ${{ inputs.postgres && 'postgres:15-alpine' || '' }}
         env:
           POSTGRES_PASSWORD: postgres
