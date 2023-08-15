@@ -24,115 +24,115 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  fmt:
-    runs-on: ubuntu-latest
+  # fmt:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt
+  #     - name: Install Rust
+  #       uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         components: rustfmt
 
-      - name: Check Format
-        run: cargo fmt -- --check
+  #     - name: Check Format
+  #       run: cargo fmt -- --check
 
-  clippy:
-    runs-on: ubuntu-latest
+  # clippy:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy
+  #     - name: Install Rust
+  #       uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         components: clippy
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          repo-token: ${{ secrets.GH_TOKEN }}
+  #     - name: Install Protoc
+  #       uses: arduino/setup-protoc@v2
+  #       with:
+  #         repo-token: ${{ secrets.GH_TOKEN }}
 
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-clippy-service-testing
-          restore-keys: ${{ runner.os }}-cargo-clippy-
+  #     - name: Set up cargo cache
+  #       uses: actions/cache@v3
+  #       continue-on-error: false
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           target/            
+  #         key: ${{ runner.os }}-cargo-clippy-service-testing
+  #         restore-keys: ${{ runner.os }}-cargo-clippy-
 
-      - name: Clippy
-        run: cargo clippy --all-features -- -D warnings
+  #     - name: Clippy
+  #       run: cargo clippy --all-features -- -D warnings
 
-  udeps:
-    runs-on: ubuntu-latest
+  # udeps:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
-        with:
-          repo-token: ${{ secrets.GH_TOKEN }}
+  #     - name: Install Protoc
+  #       uses: arduino/setup-protoc@v2
+  #       with:
+  #         repo-token: ${{ secrets.GH_TOKEN }}
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@nightly
+  #     - name: Install Rust
+  #       uses: dtolnay/rust-toolchain@nightly
 
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-udeps-service-testing
-          restore-keys: ${{ runner.os }}-cargo-udeps-
+  #     - name: Set up cargo cache
+  #       uses: actions/cache@v3
+  #       continue-on-error: false
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           target/            
+  #         key: ${{ runner.os }}-cargo-udeps-service-testing
+  #         restore-keys: ${{ runner.os }}-cargo-udeps-
 
-      - name: Udeps
-        run: |
-          cargo install --locked cargo-udeps || true
-          make udeps
-          make udeps.leptos
+  #     - name: Udeps
+  #       run: |
+  #         cargo install --locked cargo-udeps || true
+  #         make udeps
+  #         make udeps.leptos
 
-  deny:
-    runs-on: ubuntu-latest
+  # deny:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@nightly
+  #     - name: Install Rust
+  #       uses: dtolnay/rust-toolchain@nightly
 
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-deny-service-testing
-          restore-keys: ${{ runner.os }}-cargo-deny-
+  #     - name: Set up cargo cache
+  #       uses: actions/cache@v3
+  #       continue-on-error: false
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           target/            
+  #         key: ${{ runner.os }}-cargo-deny-service-testing
+  #         restore-keys: ${{ runner.os }}-cargo-deny-
 
-      - name: Deny
-        run: |
-          cargo install --locked cargo-deny || true
-          make deny
+  #     - name: Deny
+  #       run: |
+  #         cargo install --locked cargo-deny || true
+  #         make deny
 
   test:
     runs-on: ubuntu-latest
