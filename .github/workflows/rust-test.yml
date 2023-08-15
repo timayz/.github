@@ -139,7 +139,7 @@ jobs:
 
     services:
       postgres:
-        image: ${{ inputs.postgres && 'postgres:15-alpine' || '' }}
+        image: ${{ inputs.postgres && 'postgres:15.4-alpine' || '' }}
         env:
           POSTGRES_PASSWORD: postgres
         # Set health checks to wait until postgres has started
