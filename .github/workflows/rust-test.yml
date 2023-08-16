@@ -184,7 +184,7 @@ jobs:
           docker run -d --name roach --hostname roach -p 26257:26257 -p 8080:8080 cockroachdb/cockroach:${{ inputs.cockroach-version }} start-single-node --insecure
           sudo apt update && sudo apt install wait-for-it -y
           wait-for-it -h localhost -p 26257
-          docker exec roach bash -c "echo 'CREATE USER IF NOT EXISTS 'timada'; GRANT ALL ON * TO 'timada' WITH GRANT OPTION;ALTER USER 'timada' CREATEDB;' | cockroach sql --insecure"
+          docker exec roach bash -c "echo 'CREATE USER IF NOT EXISTS timada; GRANT admin TO timada;' | cockroach sql --insecure"
 
       - name: Test
         run: make test
