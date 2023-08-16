@@ -44,25 +44,59 @@ jobs:
           contents: |
             import os, sys, subprocess, json, tomlkit
 
+            def publish(name):
+                process = subprocess.run(['cargo', 'publish', '--no-verify', '-p', name])
+
+                if process.returncode > 0:
+                    sys.exit(process.returncode)
+
+            def filter_deps(entry):
+                key, value = entry
+
+                if "path" in value:
+                    return True
+                
+                return False
+
+            def publish_deps(manifests, manifest, published):
+                deps = dict(filter(filter_deps, manifest["dependencies"].items()))
+                
+                for key in deps:
+                    if key not in manifests:
+                        print('publish not enabled for', key)
+                        sys.exit(1)
+                    published = publish_deps(manifests, manifests[key], published)
+
+                name = manifest["package"]["name"]
+
+                if not name in published:
+                    published[name] = True
+                    publish(name)
+
+                return published
+
             metadata = subprocess.run(['cargo', 'metadata', '--format-version', '1', '--offline', '--no-deps'], stdout=subprocess.PIPE).stdout.decode('utf-8')
             metadata = json.loads(metadata)
 
+            manifests = dict()
+
             for package in metadata['packages']:
                 with open(package['manifest_path'], mode="rt", encoding="utf-8") as fp:
-                        config = tomlkit.load(fp)
+                        manifest = tomlkit.load(fp)
 
-                package = config["package"]
+                package = manifest["package"]
 
                 if not "publish" in package:
                     continue
 
-                if not package["publish"]:
-                    continue
+                if package["publish"]:
+                    manifests[package["name"]] = manifest
 
-                process = subprocess.run(['cargo', 'publish', '--no-verify', '-p', package["name"]])
 
-                if process.returncode > 0:
-                    sys.exit(process.returncode)
+            published = dict()
+
+            for key in manifests:
+                published = publish_deps(manifests, manifests[key], published)
 
       - name: Publish
         if: ${{ inputs.publish }}
