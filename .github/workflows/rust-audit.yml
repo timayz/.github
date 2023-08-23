@@ -4,34 +4,6 @@ on:
   workflow_call:
 
 jobs:
-  outdated:
-    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-outdated-service-audit
-          restore-keys: ${{ runner.os }}-cargo-outdated-
-
-      - name: Uutdated
-        run: |
-          cargo install --locked cargo-outdated || true
-          cargo outdated --exit-code 1
-  
   audit:
     if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
     runs-on: ubuntu-latest
@@ -87,3 +59,31 @@ jobs:
         run: |
           cargo install --locked cargo-pants || true
           cargo pants
+
+  deny:
+    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-deny-service-audit
+          restore-keys: ${{ runner.os }}-cargo-deny-
+
+      - name: Deny
+        run: |
+          cargo install --locked cargo-deny || true
+          cargo deny check
