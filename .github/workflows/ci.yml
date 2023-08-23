@@ -15,11 +15,9 @@ jobs:
         with:
           persist-credentials: false
       - uses: pnpm/action-setup@v2
-        with:
-          version: 6.32.4
       - uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
+          node-version: "18.x"
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

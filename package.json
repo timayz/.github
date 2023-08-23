@@ -16,6 +16,7 @@
   "homepage": "https://github.com/timada-org/.github#readme",
   "devDependencies": {
     "@semantic-release/git": "^10.0.1",
-    "semantic-release": "^19.0.5"
+    "marked-terminal": "^5.2.0",
+    "semantic-release": "^21.0.9"
   }
 }
