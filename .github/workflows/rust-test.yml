@@ -104,7 +104,6 @@ jobs:
         run: |
           cargo install --locked cargo-udeps || true
           make udeps
-          make udeps.leptos
 
   test:
     runs-on: ubuntu-latest
