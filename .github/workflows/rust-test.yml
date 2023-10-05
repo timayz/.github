@@ -76,7 +76,7 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-features -- -D warnings
 
-  udeps:
+  machete:
     runs-on: ubuntu-latest
 
     steps:
