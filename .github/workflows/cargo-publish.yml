@@ -60,6 +60,9 @@ jobs:
 
             def publish_deps(manifests, manifest, published):
                 deps = dict(filter(filter_deps, manifest["dependencies"].items()))
+
+                if "dev-dependencies" in manifest:
+                  deps.update(dict(filter(filter_deps, manifest["dev-dependencies"].items())))
                 
                 for key in deps:
                     if key not in manifests:
