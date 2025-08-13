@@ -8,7 +8,15 @@ on:
         required: false
         type: boolean
       postgres-image:
-        default: 'postgres:16.0-alpine'
+        default: 'postgres:17.5-alpine'
+        required: false
+        type: string
+      mysql:
+        default: false
+        required: false
+        type: boolean
+      mysql-image:
+        default: 'mysql:8.0-debian'
         required: false
         type: string
       cockroach:
@@ -16,7 +24,7 @@ on:
         required: false
         type: boolean
       cockroach-version:
-        default: 'v23.1.10'
+        default: 'v24.3.18'
         required: false
         type: string
       cockroach-user:
@@ -160,6 +168,20 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+
+      mysql:
+        image: ${{ inputs.mysql && inputs.mysql-image || '' }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd 'mysqladmin ping -h localhost'
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 3306:3306
 
     steps:
       - name: Checkout
