@@ -158,7 +158,7 @@ jobs:
       postgres:
         image: ${{ inputs.postgres && inputs.postgres-image || '' }}
         env:
-          POSTGRES_PASSWORD: root 
+          POSTGRES_PASSWORD: postgres 
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
