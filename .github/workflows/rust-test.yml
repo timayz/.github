@@ -125,7 +125,7 @@ jobs:
 
     strategy:
       matrix:
-        cmd: ${{ fromJSON(github.event.inputs.tests) }}
+        cmd: ${{ fromJSON(inputs.tests) }}
 
     services:
       postgres:
