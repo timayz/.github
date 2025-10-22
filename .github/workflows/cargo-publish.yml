@@ -15,8 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Create requirements file
         uses: "DamianReeves/write-file-action@master"
@@ -28,13 +27,12 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
-          cache: 'pip'
+          python-version: "3.9"
+          cache: "pip"
 
       - run: pip install -r requirements.txt
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
 
       - name: Create publish file
         uses: "DamianReeves/write-file-action@master"
