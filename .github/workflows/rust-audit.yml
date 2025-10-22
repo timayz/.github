@@ -2,9 +2,13 @@ name: "Audit"
 
 on:
   workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
 
 jobs:
-  audit:
+  auditable:
     if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
     runs-on: ubuntu-latest
     steps:
@@ -12,33 +16,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
 
-      - name: Audit
-        run: |
-          cargo install --locked cargo-audit || true
-          cargo audit
-
-  pants:
-    if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-
-      - name: Pants
-        run: |
-          cargo install --locked cargo-pants || true
-          cargo pants
-
-  # deny:
-  #   if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: dtolnay/rust-toolchain@nightly
-  #     - uses: Swatinem/rust-cache@v2
-
-  # - name: Deny
-  #   run: |
-  #     cargo install --locked cargo-deny || true
-  #     cargo deny check
+      - run: |
+          cargo install --locked cargo-auditable cargo-audit || true
+          cargo auditable build --release
+          cargo audit bin target/release/${{ inputs.name }}
