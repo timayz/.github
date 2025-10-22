@@ -2,6 +2,7 @@ name: "Audit"
 
 on:
   workflow_call:
+  pull_request:
 
 jobs:
   audit:
