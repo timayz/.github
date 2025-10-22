@@ -72,6 +72,8 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
 
       - run: cargo clippy --all-features -- -D warnings
 
@@ -89,6 +91,8 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
 
       - run: |
           cargo install --locked cargo-machete || true
@@ -143,6 +147,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.cmd }}
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
 
       - name: Start a single CockroachDB instance with docker
         if: ${{ inputs.cockroach }}
