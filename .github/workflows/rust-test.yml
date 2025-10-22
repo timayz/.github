@@ -8,7 +8,7 @@ on:
         required: false
         type: boolean
       postgres-image:
-        default: 'postgres:17.5-alpine'
+        default: "postgres:17.5-alpine"
         required: false
         type: string
       mysql:
@@ -16,7 +16,7 @@ on:
         required: false
         type: boolean
       mysql-image:
-        default: 'mysql:8.0-debian'
+        default: "mysql:8.0-debian"
         required: false
         type: string
       cockroach:
@@ -24,11 +24,19 @@ on:
         required: false
         type: boolean
       cockroach-version:
-        default: 'v24.3.18'
+        default: "v24.3.18"
         required: false
         type: string
       cockroach-user:
-        default: 'timada'
+        default: "timada"
+        required: false
+        type: string
+      protoc:
+        default: false
+        required: false
+        type: boolean
+      tests:
+        default: '["--workspace"]'
         required: false
         type: string
 
@@ -40,119 +48,84 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
 
-      - name: Check Format
-        run: cargo fmt -- --check
+      - run: cargo fmt -- --check
 
   clippy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+      - uses: arduino/setup-protoc@v2
+        if: ${{ inputs.protoc }}
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-clippy-service-testing
-          restore-keys: ${{ runner.os }}-cargo-clippy-
+      - uses: Swatinem/rust-cache@v2
 
-      - name: Clippy
-        run: cargo clippy --all-features -- -D warnings
+      # - name: Set up cargo cache
+      #   uses: actions/cache@v3
+      #   continue-on-error: false
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/
+      #       ~/.cargo/registry/index/
+      #       ~/.cargo/registry/cache/
+      #       ~/.cargo/git/db/
+      #       target/
+      #     key: ${{ runner.os }}-cargo-clippy-service-testing
+      #     restore-keys: ${{ runner.os }}-cargo-clippy-
+
+      - run: cargo clippy --all-features -- -D warnings
 
   machete:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
       - name: Install Protoc
+        if: ${{ inputs.protoc }}
         uses: arduino/setup-protoc@v2
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
 
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-machete-service-testing
-          restore-keys: ${{ runner.os }}-cargo-machete-
+      # - name: Set up cargo cache
+      #   uses: actions/cache@v3
+      #   continue-on-error: false
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/
+      #       ~/.cargo/registry/index/
+      #       ~/.cargo/registry/cache/
+      #       ~/.cargo/git/db/
+      #       target/
+      #     key: ${{ runner.os }}-cargo-machete-service-testing
+      #     restore-keys: ${{ runner.os }}-cargo-machete-
 
-      - name: Machete
-        run: |
+      - run: |
           cargo install --locked cargo-machete || true
           cargo machete
 
-  # @disabled in favor of machete
-  # udeps:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Install Protoc
-  #       uses: arduino/setup-protoc@v2
-  #       with:
-  #         repo-token: ${{ secrets.GH_TOKEN }}
-
-  #     - name: Install Rust
-  #       uses: dtolnay/rust-toolchain@nightly
-
-  #     - name: Set up cargo cache
-  #       uses: actions/cache@v3
-  #       continue-on-error: false
-  #       with:
-  #         path: |
-  #           ~/.cargo/bin/
-  #           ~/.cargo/registry/index/
-  #           ~/.cargo/registry/cache/
-  #           ~/.cargo/git/db/
-  #           target/            
-  #         key: ${{ runner.os }}-cargo-udeps-service-testing
-  #         restore-keys: ${{ runner.os }}-cargo-udeps-
-
-  #     - name: Udeps
-  #       run: |
-  #         cargo install --locked cargo-udeps || true
-  #         make udeps
-
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        cmd: ${{ fromJSON(github.event.inputs.tests) }}
 
     services:
       postgres:
@@ -184,29 +157,29 @@ jobs:
           - 3306:3306
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v2
+      - uses: arduino/setup-protoc@v2
+        if: ${{ inputs.protoc }}
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-test-service-testing
-          restore-keys: ${{ runner.os }}-cargo-test-
+      - uses: Swatinem/rust-cache@v2
+
+      # - name: Set up cargo cache
+      #   uses: actions/cache@v3
+      #   continue-on-error: false
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/
+      #       ~/.cargo/registry/index/
+      #       ~/.cargo/registry/cache/
+      #       ~/.cargo/git/db/
+      #       target/
+      #     key: ${{ runner.os }}-cargo-test-service-testing
+      #     restore-keys: ${{ runner.os }}-cargo-test-
 
       - name: Start a single CockroachDB instance with docker
         if: ${{ inputs.cockroach }}
@@ -217,5 +190,4 @@ jobs:
           wait-for-it -h localhost -p 26257
           docker exec roach bash -c "echo 'CREATE USER IF NOT EXISTS ${{ inputs.cockroach-user }}; GRANT admin TO ${{ inputs.cockroach-user }};' | cockroach sql --insecure"
 
-      - name: Test
-        run: make test
+      - run: cargo test ${{ matrix.cmd }}
