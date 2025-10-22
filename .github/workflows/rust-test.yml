@@ -73,19 +73,6 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      # - name: Set up cargo cache
-      #   uses: actions/cache@v3
-      #   continue-on-error: false
-      #   with:
-      #     path: |
-      #       ~/.cargo/bin/
-      #       ~/.cargo/registry/index/
-      #       ~/.cargo/registry/cache/
-      #       ~/.cargo/git/db/
-      #       target/
-      #     key: ${{ runner.os }}-cargo-clippy-service-testing
-      #     restore-keys: ${{ runner.os }}-cargo-clippy-
-
       - run: cargo clippy --all-features -- -D warnings
 
   machete:
@@ -102,19 +89,6 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-
-      # - name: Set up cargo cache
-      #   uses: actions/cache@v3
-      #   continue-on-error: false
-      #   with:
-      #     path: |
-      #       ~/.cargo/bin/
-      #       ~/.cargo/registry/index/
-      #       ~/.cargo/registry/cache/
-      #       ~/.cargo/git/db/
-      #       target/
-      #     key: ${{ runner.os }}-cargo-machete-service-testing
-      #     restore-keys: ${{ runner.os }}-cargo-machete-
 
       - run: |
           cargo install --locked cargo-machete || true
@@ -167,19 +141,8 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - uses: Swatinem/rust-cache@v2
-
-      # - name: Set up cargo cache
-      #   uses: actions/cache@v3
-      #   continue-on-error: false
-      #   with:
-      #     path: |
-      #       ~/.cargo/bin/
-      #       ~/.cargo/registry/index/
-      #       ~/.cargo/registry/cache/
-      #       ~/.cargo/git/db/
-      #       target/
-      #     key: ${{ runner.os }}-cargo-test-service-testing
-      #     restore-keys: ${{ runner.os }}-cargo-test-
+        with:
+          key: ${{ matrix.cmd }}
 
       - name: Start a single CockroachDB instance with docker
         if: ${{ inputs.cockroach }}
