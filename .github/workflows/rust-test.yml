@@ -36,7 +36,7 @@ on:
         required: false
         type: boolean
       tests:
-        default: '["--workspace"]'
+        default: '["cargo test --workspace"]'
         required: false
         type: string
 
@@ -158,4 +158,4 @@ jobs:
           wait-for-it -h localhost -p 26257
           docker exec roach bash -c "echo 'CREATE USER IF NOT EXISTS ${{ inputs.cockroach-user }}; GRANT admin TO ${{ inputs.cockroach-user }};' | cockroach sql --insecure"
 
-      - run: cargo test ${{ matrix.cmd }}
+      - run: ${{ matrix.cmd }}
