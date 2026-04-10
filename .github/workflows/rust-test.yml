@@ -96,7 +96,7 @@ jobs:
 
       - run: |
           cargo install --locked cargo-machete || true
-          cargo machete
+          cargo machete --with-metadata
 
   test:
     runs-on: ubuntu-latest
