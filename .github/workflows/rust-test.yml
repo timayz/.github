@@ -42,6 +42,11 @@ on:
 
 env:
   RUST_BACKTRACE: 1
+  # Keep cached target dirs small: no incremental dirs, and just enough
+  # debug info for file/line numbers in backtraces.
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: line-tables-only
+  CARGO_PROFILE_TEST_DEBUG: line-tables-only
 
 jobs:
   fmt:
@@ -73,6 +78,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-bin: false
           save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
 
       - run: cargo clippy --all-features -- -D warnings
@@ -90,13 +96,20 @@ jobs:
           repo-token: ${{ secrets.GH_TOKEN }}
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-machete
+
+      # `cargo machete --with-metadata` only reads manifests + the registry,
+      # so there is no target dir worth keeping here.
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-targets: false
+          cache-bin: false
           save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
 
-      - run: |
-          cargo install --locked cargo-machete || true
-          cargo machete --with-metadata
+      - run: cargo machete --with-metadata
 
   test:
     runs-on: ubuntu-latest
@@ -144,10 +157,14 @@ jobs:
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
+      # One cache for the whole matrix instead of one per test command.
+      # Only the first entry saves it, so the matrix does not race to upload
+      # the same key and the cached artifacts stay deterministic.
       - uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.cmd }}
-          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
+          shared-key: test
+          cache-bin: false
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
 
       - name: Start a single CockroachDB instance with docker
         if: ${{ inputs.cockroach }}

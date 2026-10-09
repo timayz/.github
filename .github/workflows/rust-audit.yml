@@ -7,6 +7,9 @@ on:
         required: true
         type: string
 
+env:
+  CARGO_INCREMENTAL: 0
+
 jobs:
   auditable:
     if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
@@ -14,9 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-auditable,cargo-audit
+
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
 
       - run: |
-          cargo install --locked cargo-auditable cargo-audit || true
           cargo auditable build --release
           cargo audit bin target/release/${{ inputs.name }}
