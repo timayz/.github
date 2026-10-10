@@ -118,6 +118,11 @@ jobs:
       matrix:
         cmd: ${{ fromJSON(inputs.tests) }}
 
+    env:
+      # One cache for the whole matrix, saved by the first entry only, so the
+      # matrix does not race to upload the same key.
+      SAVE_CACHE: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
+
     services:
       postgres:
         image: ${{ inputs.postgres && inputs.postgres-image || '' }}
@@ -157,14 +162,14 @@ jobs:
         with:
           repo-token: ${{ secrets.GH_TOKEN }}
 
-      # One cache for the whole matrix instead of one per test command.
-      # Only the first entry saves it, so the matrix does not race to upload
-      # the same key and the cached artifacts stay deterministic.
+      # A red test run still produces valid dependency artifacts; saving them
+      # keeps pull requests from rebuilding deps until main is green again.
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: test
           cache-bin: false
-          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
+          cache-on-failure: true
+          save-if: ${{ env.SAVE_CACHE }}
 
       - name: Start a single CockroachDB instance with docker
         if: ${{ inputs.cockroach }}
@@ -176,3 +181,25 @@ jobs:
           docker exec roach bash -c "echo 'CREATE USER IF NOT EXISTS ${{ inputs.cockroach-user }}; GRANT admin TO ${{ inputs.cockroach-user }};' | cockroach sql --insecure"
 
       - run: ${{ matrix.cmd }}
+
+      # Each matrix entry resolves dependency features for its own package
+      # set (`cargo test -p <crate>`), so the entries need different
+      # dependency artifacts. A cache holding only the first entry's build
+      # leaves the others recompiling hundreds of crates on every run.
+      # Before the first entry saves, build every other entry's dependencies
+      # too, with a runner that skips executing the test binaries, so the
+      # single cache holds the union of all variants. Failures here are only
+      # warnings: the real test results come from the matrix entries.
+      - name: Warm the cache with the other matrix entries
+        if: ${{ env.SAVE_CACHE == 'true' }}
+        env:
+          TESTS: ${{ inputs.tests }}
+          CURRENT: ${{ matrix.cmd }}
+        run: |
+          export "CARGO_TARGET_$(rustc -vV | sed -n 's/^host: //p' | tr 'a-z-' 'A-Z_')_RUNNER=true"
+          jq -r '.[]' <<< "$TESTS" | while read -r cmd; do
+            [ "$cmd" = "$CURRENT" ] && continue
+            echo "::group::$cmd"
+            bash -ec "$cmd" || echo "::warning::Cache warm-up failed for: $cmd"
+            echo "::endgroup::"
+          done
