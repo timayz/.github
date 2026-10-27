@@ -15,19 +15,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Create requirements file
-        uses: "DamianReeves/write-file-action@master"
+        uses: "DamianReeves/write-file-action@v1.3"
         with:
           path: requirements.txt
           write-mode: overwrite
           contents: |
-            tomlkit==0.12.1
+            tomlkit==0.15.2
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v7
         with:
-          python-version: "3.9"
+          python-version: "3.14"
           cache: "pip"
 
       - run: pip install -r requirements.txt
@@ -35,7 +35,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Create publish file
-        uses: "DamianReeves/write-file-action@master"
+        uses: "DamianReeves/write-file-action@v1.3"
         with:
           path: publish.py
           write-mode: overwrite

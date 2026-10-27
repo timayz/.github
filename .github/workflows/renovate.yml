@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Create config file
-        uses: "DamianReeves/write-file-action@master"
+        uses: "DamianReeves/write-file-action@v1.3"
         with:
           path: renovate.json
           write-mode: overwrite
@@ -24,8 +24,8 @@ jobs:
             }
 
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v43.0.16
+        uses: renovatebot/github-action@v46.3.10
         with:
-          renovate-version: 41.145.2
+          renovate-version: 44.186.4
           configurationFile: renovate.json
           token: ${{ secrets.GH_TOKEN }}
