@@ -13,7 +13,7 @@ env:
 jobs:
   auditable:
     if: "!startsWith(github.event.commits[0].message, 'chore(release): ')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable

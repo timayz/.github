@@ -50,7 +50,7 @@ env:
 
 jobs:
   fmt:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v5
@@ -62,7 +62,7 @@ jobs:
       - run: cargo fmt -- --check
 
   clippy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v5
@@ -84,7 +84,7 @@ jobs:
       - run: cargo clippy --all-features -- -D warnings
 
   machete:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v5
@@ -112,7 +112,7 @@ jobs:
       - run: cargo machete --with-metadata
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
