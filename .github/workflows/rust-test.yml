@@ -79,7 +79,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           cache-bin: false
-          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) }}
 
       - run: cargo clippy --all-features -- -D warnings
 
@@ -107,7 +107,7 @@ jobs:
         with:
           cache-targets: false
           cache-bin: false
-          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) }}
 
       - run: cargo machete --with-metadata
 
@@ -121,7 +121,7 @@ jobs:
     env:
       # One cache for the whole matrix, saved by the first entry only, so the
       # matrix does not race to upload the same key.
-      SAVE_CACHE: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
+      SAVE_CACHE: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
 
     services:
       postgres:
@@ -211,7 +211,7 @@ jobs:
   # one each of them last used on this branch and delete the rest.
   prune-caches:
     needs: [clippy, machete, test]
-    if: ${{ always() && contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
+    if: ${{ always() && contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) }}
     runs-on: ubuntu-24.04
     # Never what makes a run red.
     continue-on-error: true
