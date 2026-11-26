@@ -10,6 +10,16 @@ on:
         default: true
         required: false
         type: boolean
+      file:
+        description: The Dockerfile to build, from the root of the repository
+        default: "Dockerfile"
+        required: false
+        type: string
+      tag-prefix:
+        description: What every tag starts with, for a repository that holds several images ("api-" gives api-1.2.3, api-latest)
+        default: ""
+        required: false
+        type: string
     secrets:
       DOCKER_REGISTRY_USER:
         required: true
@@ -29,6 +39,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.image }}
+          # Under a prefix, `latest` too: each image of the repository has
+          # its own.
+          flavor: ${{ inputs.tag-prefix != '' && format('prefix={0},onlatest=true', inputs.tag-prefix) || '' }}
           labels: |
             org.opencontainers.image.licenses=AGPL-3.0
             org.opencontainers.image.vendor=Timada
@@ -52,6 +65,7 @@ jobs:
       - name: Build and push image to container registry
         uses: docker/build-push-action@v6
         with:
+          file: ${{ inputs.file }}
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
