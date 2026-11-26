@@ -79,7 +79,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           cache-bin: false
-          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) }}
 
       - run: cargo clippy --all-features -- -D warnings
 
@@ -107,7 +107,7 @@ jobs:
         with:
           cache-targets: false
           cache-bin: false
-          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) }}
+          save-if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) }}
 
       - run: cargo machete --with-metadata
 
@@ -121,7 +121,7 @@ jobs:
     env:
       # One cache for the whole matrix, saved by the first entry only, so the
       # matrix does not race to upload the same key.
-      SAVE_CACHE: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rn"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
+      SAVE_CACHE: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) && matrix.cmd == fromJSON(inputs.tests)[0] }}
 
     services:
       postgres:
@@ -203,3 +203,45 @@ jobs:
             bash -ec "$cmd" || echo "::warning::Cache warm-up failed for: $cmd"
             echo "::endgroup::"
           done
+
+  # A cache key ends in a hash of Cargo.lock, since a cache is never written
+  # twice under one key: every change to the dependencies saves another one,
+  # and the ones before it stay until GitHub evicts them, a week later or
+  # when the repository is full. Once the jobs above saved theirs, keep the
+  # one each of them last used on this branch and delete the rest.
+  prune-caches:
+    needs: [clippy, machete, test]
+    if: ${{ always() && contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta", "refs/heads/rc"]'), github.ref) }}
+    runs-on: ubuntu-24.04
+    # Never what makes a run red.
+    continue-on-error: true
+
+    permissions:
+      actions: write
+
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref }}
+        run: |
+          # A key is `v0-rust-<job>-<os>-<arch>-<toolchain>-<lock>`: the
+          # caches of one job are those that share everything before the
+          # last two parts.
+          gh api --paginate "repos/$REPO/actions/caches?ref=$REF&key=v0-rust-&per_page=100" \
+            --jq '.actions_caches[] | [.last_accessed_at, .id, .key] | @tsv' \
+            | sort -r \
+            | while IFS=$'\t' read -r _ id key; do
+                job="${key%-*-*}"
+                case "${kept-}" in
+                  *"|$job|"*)
+                    echo "deleting $key"
+                    gh api -X DELETE "repos/$REPO/actions/caches/$id" > /dev/null \
+                      || echo "::warning::could not delete the cache $key"
+                    ;;
+                  *)
+                    echo "keeping $key"
+                    kept="${kept-}|$job|"
+                    ;;
+                esac
+              done
