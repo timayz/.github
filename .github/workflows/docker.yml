@@ -10,6 +10,11 @@ on:
         default: true
         required: false
         type: boolean
+      file:
+        description: The Dockerfile to build, from the root of the repository
+        default: "Dockerfile"
+        required: false
+        type: string
     secrets:
       DOCKER_REGISTRY_USER:
         required: true
@@ -52,6 +57,7 @@ jobs:
       - name: Build and push image to container registry
         uses: docker/build-push-action@v6
         with:
+          file: ${{ inputs.file }}
           push: ${{ inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
